@@ -50,7 +50,7 @@ public:
 private:
     void dfsAll(int cur, int dst, vector<int> &path, vector<vector<int>> &paths) {
         /*
-            if (!visited[cur]) {
+        if (!visited[cur]) {
             visited[cur] = true;
             path.emplace_back(cur);
             if (cur == dst) {
@@ -64,6 +64,23 @@ private:
             path.pop_back();
         }
      */
+
+    /* 
+        Leetcode Solution
+
+        visited[cur] = true;
+        path.emplace_back(cur);
+        if (cur == dst) {
+            paths.emplace_back(path);
+            return;
+        } 
+        for (auto neighbor : neighbors[cur])
+            if (!visited[neighbor]) {
+               dfsAll(neighbor, dst, path, paths);
+               visited[cur] = false;
+               path.pop_back();
+            }
+     */        
 
         visited[cur] = true;
         path.emplace_back(cur);
