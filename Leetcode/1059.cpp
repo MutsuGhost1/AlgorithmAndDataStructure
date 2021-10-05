@@ -27,6 +27,8 @@ public:
                 }
             }
             visited[cur] = false;
+            /// 0 != neighbors[cur].size() means we at least try 1 neighbor
+            ///   and all of the neighbors reach the dst
             return 0 != neighbors[cur].size();
         }
         /// loop
