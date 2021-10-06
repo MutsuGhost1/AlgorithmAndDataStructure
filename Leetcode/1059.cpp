@@ -15,11 +15,15 @@ public:
     }
 
     bool dfs(vector<vector<int>> &neighbors, vector<bool> &visited, int cur, int dst) {
-        if(!visited[cur]) {
-            /// we can't put visited[cur] = true; here
-            ///    > we should move it after this check
-            if(cur == dst)
-                return true;
+        /// has loop
+        if(visited[cur])
+            return false;
+        
+        /// arrive dst
+        if(cur == dst) {
+            return true;
+        } else { 
+        /// keep going
             visited[cur] = true;
             for(auto neighbor : neighbors[cur]) {
                 if(!dfs(neighbors, visited, neighbor, dst)) {
@@ -31,7 +35,12 @@ public:
             ///   and all of the neighbors reach the dst
             return 0 != neighbors[cur].size();
         }
-        /// loop
-        return false;
     }
 };
+
+/// Time Complexity: ???
+/// 1. O(|V|!) ??? the same as perumation ????
+///
+/// Space Complexity: O(|V|+|E|)
+/// 1. Use space O(|V|) to store visited
+/// 2. Use space O(|E|) to store adjacent list
