@@ -1,7 +1,6 @@
 class Solution {
 public:
     using PII = pair<int,int>;
-    using T4 = tuple<int,int,int,int>;
     int networkDelayTime(vector<vector<int>>& times, int n, int k) {
         /// Given an directed weighted graph
         ///   Return the (min) cost of time that all nodes receive the signal
