@@ -81,3 +81,35 @@ public:
         return result >= kMax ? -1 : result;        
     }
 };
+
+class Solution {
+public:    
+    int networkDelayTime(vector<vector<int>>& times, int n, int k) {
+        /// Given an directed weighted graph
+        ///   Return the (min) cost of time that all nodes receive the signal
+        vector<vector<int>> matrix = buildGraph(times, n+1);
+        return runFloydWarshall(matrix, k, n+1);
+    }
+    
+    vector<vector<int>> buildGraph(vector<vector<int>> times, int v_num) {
+        vector<vector<int>> matrix(v_num, vector<int>(v_num, kIntMax));
+        for(int i=0; i<v_num; i++)
+            matrix[i][i]=0;
+        for(auto &time : times)
+            matrix[time[0]][time[1]] = time[2];
+        return matrix;
+    }
+    
+    int runFloydWarshall(vector<vector<int>> &matrix, int src, int v_num){
+        for(int k=0; k<v_num; k++)
+            for(int i=0; i<v_num; i++)
+                for(int j=0; j<v_num; j++)
+                    if(matrix[i][j] > matrix[i][k] + matrix[k][j])
+                        matrix[i][j] = matrix[i][k] + matrix[k][j];
+        int result = *max_element(matrix[src].begin()+1, matrix[src].end());
+        return result < kIntMax ? result : -1;
+    }
+    
+private:
+    const int kIntMax = 100000000;
+};
