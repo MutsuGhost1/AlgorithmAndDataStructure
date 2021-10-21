@@ -1,11 +1,10 @@
 class Solution {
 public:
     int totalNQueens(int n) {
-        kBoardSize=n;
-        return countNQueuesSolution();
+        return countNQueuesSolution(n);
     }
 
-    int countNQueuesSolution(int c_row=0, int c_col=0) {
+    int countNQueuesSolution(const int kBoardSize, int c_row=0, int c_col=0) {
         /// stop when reaching the last row
         if(c_row >= kBoardSize) {
             return 1;
@@ -15,7 +14,7 @@ public:
             if(!hasAttack(c_row, col)) {
                /// move to next row only when we occupy the row
                occupied.push_back(make_pair(c_row, col));
-               sum += countNQueuesSolution(c_row+1, c_col);
+               sum += countNQueuesSolution(kBoardSize, c_row+1, c_col);
                occupied.pop_back();
             }
         return sum;
@@ -30,5 +29,4 @@ public:
     
 private:
     vector<pair<int,int>> occupied;
-    int kBoardSize;
 };
