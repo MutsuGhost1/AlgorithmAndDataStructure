@@ -101,108 +101,86 @@ void funcMove(const Data&& data) {
 	cout << endl;
 }
 
+class Node {
+public:
+	int val;
+	Node* left;
+	Node* right;
+
+	Node() {}
+
+	Node(int _val) {
+		val = _val;
+		left = NULL;
+		right = NULL;
+	}
+
+	Node(int _val, Node* _left, Node* _right) {
+		val = _val;
+		left = _left;
+		right = _right;
+	}
+};
 
 class Solution {
 public:
-	vector<int> sortArray(vector<int>& nums) {
-		quickSort(nums, 0, nums.size()-1);
-		return nums;
+	bool searchMatrix(vector<vector<int>>& matrix, int target) {
+		return solve(matrix, 0, matrix[0].size(), target);
 	}
 
-	/// two pointer
-	int partition(vector<int>& nums, int s, int e) {
-/*
-		int j = s, pi = e;
-		for (int i = s; i < e; i++)
-			if (nums[i] > nums[pi])
-				swap(nums[i], nums[j++]);
-		swap(nums[j], nums[pi]);
-		return j;
-*/
-		cout << __func__ << endl;
-		for (auto num : nums)
-			cout << num << " ";
-		cout << endl;
-		int l = s, r = e, pivot = nums[s];
-		while (l < r) {
-			while (nums[l] < pivot) l++;
-			while (nums[r] > pivot) r--;
-			if (l < r) swap(nums[l++], nums[r--]);
-		}
-		for (auto num : nums)
-			cout << num << " ";
-		cout << endl;
-		cout << "pivot:" << pivot << " l=" << l << endl;
-		return l;
-	}
+	/// dry run
+	///
+	/// [[-1], [-1]], row_size=2, col_size=1
+	///
+	/// > solve(matrix, 0, 1, 0) - c_row=0, col_size=1, target=0
+	///   check - 0 >= 1 || 1 < 1 -- false
+	///   check - pos = binSearch(matrix[0], 0, 0, 0)
+	///                 > pos=-1
+	///           pos=-1
+	///   call - solve(matrix, 1, 1, 0)
+	///   call - solve(matrix, 2, 1, 0)
 
-	void quickSort(vector<int>& nums, int s, int e) {
-		/// s == e means it's sorted, we needn't do anything
-		if (s < e) {
-			int p = partition(nums, s, e);
-			quickSort(nums, s, p-1);
-			quickSort(nums, p + 1, e);
-		}
-	}
-
-	void mergeSortR(vector<int>& nums, int s, int e) {
-		if (s >= e)
-			return;
+	bool solve(vector<vector<int>>& matrix, int c_row, int col_size, int target) {
+		if (c_row >= matrix.size() || col_size > matrix[0].size() || col_size < 1)
+			return false;
 		else {
-			int m = s + (e - s) / 2;
-			mergeSortR(nums, s, m);
-			mergeSortR(nums, m + 1, e);
-			mergeTwo(nums, s, m, e);
+			if (int pos = binSearch(matrix[c_row], 0, col_size - 1, target); pos >= 0)
+				return true;
+			else
+				return solve(matrix, c_row + 1, min(-pos, (int)matrix.size()), target);
 		}
 	}
 
-	/// s 
-	/// 0 1 2
-	void mergeSortI(vector<int>& nums) {
-		int len = nums.size();
-		for (int seg = 1; seg < len; seg += seg)
-			for (int start = 0; start < len; start += 2 * seg) {
-				mergeTwo(nums, start, min(start + seg, len-1), min(start + 2 * seg, len-1));
+	int binSearch(vector<int>& nums, int lo, int hi, int target) {
+			if (lo <= hi) {
+				int mid = lo + (hi - lo) / 2;
+				if (target > nums[mid]) {
+					return binSearch(nums, mid + 1, hi, target);
+				}
+				else if (target < nums[mid]) {
+					return binSearch(nums, lo, mid - 1, target);
+				}
+				else {
+					return mid;
+				}
 			}
-	}
-
-	void mergeTwo(vector<int>& nums, int s, int m, int e) {
-		if (m + 1 > e) return;
-
-		int left = 0, right = 0;
-		vector<int> l(nums.begin() + s, nums.begin() + m + 1);
-		vector<int> r(nums.begin() + m + 1, nums.begin() + e + 1);
-		l.push_back(INT_MAX);
-		r.push_back(INT_MAX);
-		for (int i = s; i <= e; i++)
-			if (l[left] < r[right])
-				nums[i] = l[left++];
-			else
-				nums[i] = r[right++];
-
-		/*
-				while(left<l.size() && right<r.size())
-					if(l[left] < r[right])
-						nums[start++] = l[left++];
-					else
-						nums[start++] = r[right++];
-				while(left<l.size())
-					nums[start++] = l[left++];
-				while(right<r.size())
-					nums[start++] = r[right++];
-		*/
+		return -(lo + 1);
 	}
 };
 
 int main()
 {
-	Solution s;
-	vector<int> data = { -2,3,-5 };
-	s.sortArray(data);
+	Solution ds;
+	vector<vector<int>> data = { 
+		{1, 4, 7, 11, 15},
+		{2, 5, 8, 12, 19},
+		{3, 6, 9, 16, 22},
+		{10, 13, 14, 17, 24},
+		{18, 21, 23, 26, 30},
+	};
 
-	for (auto i : data)
-		cout << i << " ";
-	cout << endl;
+	cout << ds.searchMatrix(data, 20) << endl;
+
 /*
 	/// 1. pass an instance into a container 
 	///    a. pass by value
