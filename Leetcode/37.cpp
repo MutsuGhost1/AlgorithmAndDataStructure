@@ -5,20 +5,20 @@ public:
     }
     
     bool canSolve(vector<vector<char>>& board, int c_row=0, int c_col=0) {
-        /// get the solution
+        /// next row
+        if(c_col == board.size())
+            return canSolve(board, c_row+1, 0);
+        /// fill the final blank then get the solution
         if(c_row == board.size())
             return true;
 
-        int n_row = c_row + (c_col+1) / board.size();
-        int n_col = (c_col+1) % board.size();
-
         if('.' != board[c_row][c_col]) {
-            return canSolve(board, n_row, n_col);
+            return canSolve(board, c_row, c_col+1);
         } else {
             for(int digit=1; digit<=board.size(); digit++) {
                 if(validSudoku(board, c_row, c_col, digit + '0')) {
                     board[c_row][c_col] = digit + '0';
-                    if(canSolve(board, n_row, n_col))
+                    if(canSolve(board, c_row, c_col+1))
                         return true;
                     board[c_row][c_col] = '.';
                 }
