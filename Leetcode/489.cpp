@@ -19,97 +19,75 @@
 
 class Solution {
 public:
-    enum direction : int { N=0, W, S, E };
-
     void cleanRoom(Robot& robot) {
         solve(robot, N, true);
-    }
-    
+    }    
+private:
+    enum direction : int { N=0, W, S, E };
+
     void solve(Robot& robot, direction prev_dir, bool start=false) {
-        if(hasDone()) {
+        if(DONE == status[0][0])
             return;
-        }
-        status[c_row][c_col] = ING;
-        robot.clean();
-        for(int i=0; i<dirs.size(); i++) {
-            direction back_dir = toOppositeDir(prev_dir);
-            if(!start && toLeftDir(cur_dir, i) == back_dir)
-                continue;
-            if(tryMoveTo(robot, toLeftDir(cur_dir, i))) {
+        clean(robot);
+        for(direction next_dir : dirs) {
+            if(!start && next_dir == toOppositeDir(prev_dir))
+               continue;
+            if(tryMoveTo(robot, next_dir))
                 solve(robot, cur_dir);
-            }
         }
         backTo(robot, prev_dir);
     }
-    
-    bool hasDone() {
-        return DONE == status[0][0];
-    }
-    
+        
     bool tryMoveTo(Robot& robot, direction next_dir) {
         /// 1. turn to this way
-/*
-        cout << __func__ << ": From (" << c_row << "," << c_col << ")";
-        cout << " To: (" << c_row+dir_vals[next_dir].first << ","
-             << c_col+dir_vals[next_dir].second << ")" << endl;
-*/
         turnTo(robot, next_dir);
-        /// 2. move
+        /// 2. try move
         c_row += dir_vals[cur_dir].first;
         c_col += dir_vals[cur_dir].second;
         if(NONE == status[c_row][c_col] && robot.move()) {
-            status[c_row][c_col] = ING;
-//            cout << __func__ << " move - pass" << endl;
             return true;
+        } else {
+            /// try fail - restore
+            c_row -= dir_vals[cur_dir].first;
+            c_col -= dir_vals[cur_dir].second;
+            if(NONE == status[c_row][c_col])
+                status[c_row][c_col] = DONE;
+            return false;
         }
-        c_row -= dir_vals[cur_dir].first;
-        c_col -= dir_vals[cur_dir].second;
-        if(NONE == status[c_row][c_col])
-            status[c_row][c_col] = DONE;
-//        cout << __func__ << " move - fail" << endl;
-        return false;
     }
     
-    /// 1,     1       
-    /// p_row, p_col + offset = c_row, c_col
+    void clean(Robot& robot) {
+        status[c_row][c_col]=ING;
+        robot.clean();        
+    }
+    
     void backTo(Robot& robot, direction prev_dir) {
-/*
-        cout << __func__ << ": previous dir " << prev_dir << endl;
-        cout << __func__ << " mark (" << c_row << "," << c_col << ") is done" << endl;
-*/
         status[c_row][c_col] = DONE;
-
         turnTo(robot, toOppositeDir(prev_dir));
         if(robot.move()) {
             c_row += dir_vals[cur_dir].first;
             c_col += dir_vals[cur_dir].second;
-//            cout << __func__ << " backTo: (" << c_row << "," << c_col << ")" << endl;
-            /// adjuct the direction to previous direction
             turnTo(robot, prev_dir);
             return;
         }
-//        cout << __func__ <<": can't back to previous ...!" << endl;
     }
     
     void turnTo(Robot& robot, direction next_dir) {
+        /// can be optimized
         while(dirs[cur_dir] != next_dir) {
-            cur_dir = nextDir();
+            cur_dir = toLeftDir(cur_dir, 1);
             robot.turnLeft();
-        }        
+        }
     }
     
-    static direction toLeftDir(direction dir, int move) {
-        return static_cast<direction>((static_cast<int>(dir)+move) % 4);
+    static direction toLeftDir(direction dir, int times) {
+        return static_cast<direction>((static_cast<int>(dir)+times)%4);
     }
+
     static direction toOppositeDir(direction dir) {
         return toLeftDir(dir, 2);
     }
 
-    direction nextDir() {
-        return toLeftDir(cur_dir, 1);
-    }
-    
-private:
     enum status { NONE=0, ING=1, DONE=2};
     const vector<direction> dirs = {N, W, S, E};
     const vector<pair<int, int>> dir_vals = { {-1, 0}, {0, -1}, {1, 0}, {0, 1} };

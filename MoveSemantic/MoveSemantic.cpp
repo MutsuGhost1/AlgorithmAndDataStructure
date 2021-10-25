@@ -168,19 +168,22 @@ public:
 	}
 };
 
+int factorial_non_tail_r(int n) {
+	if (n <= 0) return 0;
+	if (n == 1) return 1;
+	return n*factorial_non_tail_r(n - 1);
+}
+
+int factorial_tail_r(int n, int cur_ans=1) {
+	if (n <= 0) return 0;
+	if (n == 1) return cur_ans;
+	return factorial_tail_r(n - 1, cur_ans*n);
+}
+
 int main()
 {
-	Solution ds;
-	vector<vector<int>> data = { 
-		{1, 4, 7, 11, 15},
-		{2, 5, 8, 12, 19},
-		{3, 6, 9, 16, 22},
-		{10, 13, 14, 17, 24},
-		{18, 21, 23, 26, 30},
-	};
-
-	cout << ds.searchMatrix(data, 20) << endl;
-
+	cout << factorial_non_tail_r(5) << endl;
+	cout << factorial_tail_r(5) << endl;
 /*
 	/// 1. pass an instance into a container 
 	///    a. pass by value
