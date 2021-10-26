@@ -25,7 +25,7 @@ public:
 class Solution {
 public:
     Node* treeToDoublyList(Node* root) {
-        return solve2(root);
+        return solve3(root);
     }
 
     /// intuition
@@ -34,7 +34,39 @@ public:
     ///     > its left  to its left max
     ///     > its right to its right min
     ///   > finally link its left min and right max to form a circular double linked list
-    
+
+    Node* solve3(Node *node, Node **pp_min=NULL, Node **pp_max=NULL) {
+        if(node){
+            if(pp_min)
+                *pp_min = node;
+            Node *pl_min=node, *pl_max=node;
+            if(node->left) {
+                solve2Helper(node->left, &pl_min, &pl_max);
+                pl_max->right = node;
+                node->left = pl_max;
+            }
+            if(pp_max)
+                *pp_max = node;
+            Node *pr_min=node, *pr_max=node;
+            if(node->right) {
+                solve2Helper(node->right, &pr_min, &pr_max);
+                node->right = pr_min;
+                pr_min->left = node;
+            }
+            /// root
+            if(!pp_min && !pp_max) {
+                pl_min->left = pr_max;
+                pr_max->right = pl_min;
+            } else {
+            /// non-root
+                *pp_min = pl_min;
+                *pp_max = pr_max;                
+            }
+            return pl_min;
+        }
+        return NULL;
+    }
+
     Node* solve2(Node *root) {       
         Node *pmin_node=NULL, *pmax_node=NULL;
         solve2Helper(root, &pmin_node, &pmax_node);
@@ -65,7 +97,7 @@ public:
             }
         }
     }
-    
+
     Node *solve1(Node* root) {
         Node *head=NULL;
         vector<Node*> order;
