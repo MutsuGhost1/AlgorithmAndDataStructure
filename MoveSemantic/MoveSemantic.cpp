@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <algorithm>
 #include <vector>
 
 using namespace std;
@@ -122,52 +123,6 @@ public:
 	}
 };
 
-class Solution {
-public:
-	bool searchMatrix(vector<vector<int>>& matrix, int target) {
-		return solve(matrix, 0, matrix[0].size(), target);
-	}
-
-	/// dry run
-	///
-	/// [[-1], [-1]], row_size=2, col_size=1
-	///
-	/// > solve(matrix, 0, 1, 0) - c_row=0, col_size=1, target=0
-	///   check - 0 >= 1 || 1 < 1 -- false
-	///   check - pos = binSearch(matrix[0], 0, 0, 0)
-	///                 > pos=-1
-	///           pos=-1
-	///   call - solve(matrix, 1, 1, 0)
-	///   call - solve(matrix, 2, 1, 0)
-
-	bool solve(vector<vector<int>>& matrix, int c_row, int col_size, int target) {
-		if (c_row >= matrix.size() || col_size > matrix[0].size() || col_size < 1)
-			return false;
-		else {
-			if (int pos = binSearch(matrix[c_row], 0, col_size - 1, target); pos >= 0)
-				return true;
-			else
-				return solve(matrix, c_row + 1, min(-pos, (int)matrix.size()), target);
-		}
-	}
-
-	int binSearch(vector<int>& nums, int lo, int hi, int target) {
-			if (lo <= hi) {
-				int mid = lo + (hi - lo) / 2;
-				if (target > nums[mid]) {
-					return binSearch(nums, mid + 1, hi, target);
-				}
-				else if (target < nums[mid]) {
-					return binSearch(nums, lo, mid - 1, target);
-				}
-				else {
-					return mid;
-				}
-			}
-		return -(lo + 1);
-	}
-};
-
 int factorial_non_tail_r(int n) {
 	if (n <= 0) return 0;
 	if (n == 1) return 1;
@@ -180,11 +135,85 @@ int factorial_tail_r(int n, int cur_ans=1) {
 	return factorial_tail_r(n - 1, cur_ans*n);
 }
 
+vector<vector<int>> mergeTwo(vector<vector<int>>& s1, vector<vector<int>>& s2) {
+	vector<vector<int>> s;
+	int left = 0, right = 0, lh = 0, rh = 0;
+	while (left < s1.size() && right < s2.size()) {
+		if (s1[left][0] < s2[right][0]) {
+			if (0 == s1[left][1]) {
+				if (rh < lh) {
+					s.push_back({ s1[left][0], rh });
+				}
+			}
+			else {
+				if (s1[left][1] > rh) {
+					s.push_back(s1[left]);
+				}
+			}
+			lh = s1[left][1];
+			left++;
+		}
+		else {
+			if (0 == s2[right][1]) {
+				if (rh > lh) {
+					s.push_back({ s2[right][0], lh });
+				}
+			}
+			else {
+				if (s2[right][1] > lh) {
+					s.push_back(s2[right]);
+				}
+			}
+			rh = s2[right][1];
+			right++;
+		}
+	}
+	while (left < s1.size())
+		s.push_back(s1[left++]);
+	while (right < s2.size())
+		s.push_back(s2[right++]);
+	return s;
+}
+
+
+class Solution {
+public:
+	int minimumTotal(vector<vector<int>>& triangle) {
+		/// since C99, it allows VLA in stack
+		int sum[4];
+
+		///   sum = [0, 0, 0, 0]
+		///    0  1  2  3
+		/// 0 [2]           t[0].size()=1
+		/// 1 [3][4]        t[1].size()=2
+		/// 2 [6][5][7]     t[2].size()=3
+		/// 3 [4][1][8][3]  t[3].size()=4
+		///
+		///
+		/// dry run
+		///
+		memset(&sum, 0, sizeof(int) * triangle.size());
+		for (int i = 0; i < triangle.size(); i++)
+			for (int j = triangle[i].size() - 1; j >= 0; j--) {
+				cout << i - 1 << " " << j - 1 << endl;
+				int a = i - 1 >= 0 ? triangle[i - 1][j] : INT_MAX;
+				int b = (i - 1 >= 0 && j - 1 >= 0) ? triangle[i - 1][j - 1] : INT_MAX;
+				//int a=0, b=0;
+				sum[j] += min(a, b);
+			}
+		for (auto i : sum)
+			cout << i << " " << endl;
+		return *min_element(sum, sum + triangle.size());
+	}
+};
+
 int main()
 {
-	cout << factorial_non_tail_r(5) << endl;
-	cout << factorial_tail_r(5) << endl;
-/*
+	Solution ds;
+	vector<vector<int>> data = { {2}, {3,4}, {6,5,7}, {4,1,8,3} };
+	ds.minimumTotal(data);
+
+	/*
 	/// 1. pass an instance into a container 
 	///    a. pass by value
 	///    b. pass by move
