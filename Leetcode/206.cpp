@@ -1,17 +1,19 @@
 class Solution {
 public:
     ListNode* reverseList(ListNode *head) {
-        return reverseListR(head, NULL);
+        return reverseListR(nullptr, head);
     }
     
-    ListNode* reverseListR(ListNode *c_node, ListNode *p_node) {
-        if(c_node) {
-            ListNode *head=c_node;
-            if(c_node->next)
-                head = reverseListR(c_node->next, c_node);
-            c_node->next = p_node;
+    ListNode* reverseListR(ListNode *prev, ListNode *curr) {
+        ///            p  c
+        ///            
+        /// [ 1, 2, 3, 4, 5]
+        ///
+        if(curr) {
+            ListNode *head = reverseListR(curr, curr->next);
+            curr->next = prev;
             return head;
         }
-        return c_node;
+        return prev;
     }
 };
