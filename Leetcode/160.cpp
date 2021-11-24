@@ -9,10 +9,45 @@
 class Solution {
 public:
     ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
-        return solve1(headA, headB);
+//        return solve1(headA, headB);
+        return solve2(headA, headB);
     }
     
-    ListNode *solve1(ListNode *headA, ListNode *headB) {
+    /// Find the difference of the length for A and B is D
+    ///   The longger one A must wait D steps, then start to go
+    ///
+    ///   If the intersection of A and B is not empty,
+    ///     A and B will meet eventually.
+    ///
+    /// Time  Complexity: O(len|A|+len|B|+min(len|A|+len|B|))
+    /// Space Complexity: O(1)
+    ListNode* solve2(ListNode *headA, ListNode *headB) {
+        ListNode *ll = headA, *sl = headB;
+        int diff_len = lenOfList(headA) - lenOfList(headB);
+        if(0 > diff_len) {
+            swap(ll, sl);
+            diff_len = -diff_len;
+        }
+        while(diff_len-- > 0)
+            ll = ll->next;
+        while(ll && sl) {
+            if (ll == sl)
+                return ll;
+            ll = ll->next;
+            sl = sl->next;
+        }
+        return nullptr;
+    }
+    
+    int lenOfList(ListNode *curr) {
+        int len = 0;
+        for(; curr ; curr = curr->next, len++);
+        return len;
+    }
+    
+    /// Time  Complexity: O(?)
+    /// Space Complexity: O(1)
+    ListNode* solve1(ListNode *headA, ListNode *headB) {
         /// Time Complexity: O(M+N)
 
         /// 1. Note that the linked lists must retain 
