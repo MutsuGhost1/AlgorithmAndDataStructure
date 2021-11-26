@@ -44,8 +44,17 @@ public:
             fast = fast->next->next;
             head = head->next;
         }
-        if(fast)
+        if(fast) {
             len++;
+            /// without this line, it's also correct
+            /// e.g.
+            /// >  [1] -> [2] -> [1]
+            ///            m
+            ///           [1] -> [2]
+            ///    [1] -> [2]
+            /// it also works, except to compare with extra node
+            head = head->next;        
+        }
         return head;
     }
     
