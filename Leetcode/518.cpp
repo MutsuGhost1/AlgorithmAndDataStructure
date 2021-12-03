@@ -1,12 +1,41 @@
 class Solution {
 public:
     int change(int amount, vector<int>& coins) {
+        sort(coins.begin(), coins.end());
         /// amount = 5, coins = [1,2,5]
         ///   return the number of combinations that make up that amount
-        ///   If that amount of money cannot be made up by any combination of the coins, return 0
-        
-        sort(coins.begin(), coins.end());
-        return solve1(amount, coins);
+        ///   If that amount of money cannot be made up by any combination of the coins, return 0        
+        return solve0(amount, coins);
+    }
+    
+    int solve0(int amount, vector<int>& coins) {
+    /// 4 steps to find DP solution
+    ///
+    /// 1. find the state variable and function that return the ans to the given states
+    ///    let m is the current amount want to change
+    ///    let i is the start position of coins that we can use to change - coins[i:]
+    ///        dp(m, i) is number of combinations that make up that amount
+    ///
+    /// 2. find recurrence relation to transition between states
+    ///
+    ///    dp(m, i) = accumulate({dp(m-coin[idx], idx) i <= idx < coins.size() if m-coin[idx] >= 0 }, 0)
+    ///
+    /// 3. find base cases
+    ///    dp(0, i) = 1, means the amount can be changed by our coins
+    ///       is it possible to m=0 & i=n ?
+        vector<vector<int>> dp(amount+1, vector<int>(coins.size()));
+        /// 2. set base cases
+        fill(dp[0].begin(), dp[0].end(), 1);
+        for(int m=1; m<dp.size(); m++)
+            for(int i=0; i<dp[m].size(); i++) {
+                int sum = 0;
+                /// dp[m][i] is only contributed by those coins[i:]
+                for(int idx=i; idx<coins.size(); idx++)
+                    if(0 <= m-coins[idx])
+                        sum += dp[m-coins[idx]][idx];
+                dp[m][i] = sum;
+            }
+        return dp[amount][0];
     }
     
     int solve1(int amount, vector<int>& coins) {
@@ -29,17 +58,16 @@ public:
          return dp[amount][0];
     }
     
-    /// 3 steps to find DP solution
+    /// 4 steps to find DP solution
     ///
     /// 1. find the state variable and function that return the ans to the given states
     ///    let m is the current amount want to change
-    ///    let i is the start position that we can use to change
+    ///    let i is the start position of coins that we can use to change - coins[i:]
     ///        dp(m, i) is number of combinations that make up that amount
     ///
     /// 2. find recurrence relation to transition between states
     ///
-    ///    dp(m, i) = sum(dp(m-coin[i], i)) 0 <= i < coins.size() if m-coin[i] >= 0
-    ///             = 0                                 otherwise if m-coin[i] < 0
+    ///    dp(m, i) = accumulate({dp(m-coin[i], i) 0 <= i < coins.size() if m-coin[i] >= 0 }, 0)
     ///
     /// 3. find base cases
     ///    dp(0, i) = 1
