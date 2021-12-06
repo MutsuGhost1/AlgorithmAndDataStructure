@@ -1,57 +1,44 @@
-class MyHashMap {
+class MyHashSet {
 public:
-    using PII = pair<int,int>;
-
-    MyHashMap() {
-        
+    MyHashSet() {
     }
     
-    void put(int key, int value) {
-        if(auto iter=find(key); iter!=end(key)) {
-            iter->second = value;
-        } else {
-            buckets[hash(key)].push_back(make_pair(key, value));
-        }
-    }
-    
-    int get(int key) {
-        if(auto iter=find(key); iter!=end(key))
-            return iter->second;
-        return -1;
+    void add(int key) {
+        if(!contains(key))
+            buckets[hash(key)].push_back(key);
     }
     
     void remove(int key) {
-        if(auto iter=find(key); iter!=end(key))
+        if(auto iter = findPos(key); iter != end(key))
             buckets[hash(key)].erase(iter);
-   }
+    }
     
-
+    bool contains(int key) {
+        return findPos(key) != end(key);
+    }
+        
 private:
     
     int hash(int key) {
         return key % kBucketNum;
     }
 
-    list<PII>::iterator find(int key) {
-        return find_if(buckets[hash(key)].begin(),
-                       buckets[hash(key)].end(), 
-                       [key](PII &p){
-                           return p.first == key;
-                       });
+    list<int>::iterator findPos(int key) {
+        return find(buckets[hash(key)].begin(), buckets[hash(key)].end(), key);
     }
     
-    list<PII>::iterator end(int key) {
+    list<int>::iterator end(int key) {
         return buckets[hash(key)].end();
     }
     
     static const int kBucketNum = 1001;
-    array<list<PII>, kBucketNum> buckets;
+    array<list<int>, kBucketNum> buckets;
 };
 
 /**
- * Your MyHashMap object will be instantiated and called as such:
- * MyHashMap* obj = new MyHashMap();
- * obj->put(key,value);
- * int param_2 = obj->get(key);
+ * Your MyHashSet object will be instantiated and called as such:
+ * MyHashSet* obj = new MyHashSet();
+ * obj->add(key);
  * obj->remove(key);
+ * bool param_3 = obj->contains(key);
  */
