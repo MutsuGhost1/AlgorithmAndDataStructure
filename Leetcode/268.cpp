@@ -1,18 +1,22 @@
 class Solution {
 public:
     int missingNumber(vector<int>& nums) {
-/*
-        int ans = nums.size()*(nums.size()+1)/2;
-        for(int num: nums)
-            ans -= num;
-*/
+        int m_num=0;
+        for(int i=0; i<nums.size(); i++)
+            m_num ^= (nums[i]^(i+1));
+        return m_num;
+    }
+    
+    
+    
+    int solve1(vector<int>& nums) {
         int ans = 0;
         for(int i=0; i<nums.size(); i++)
             ans += (nums[i]-i-1);
-        return -ans;
+        return -ans;        
     }
     
-    int solve1(vector<int>& nums) {
+    int solve2(vector<int>& nums) {
         /// dry run
         ///           0 1 2
         /// > nums = [3,0,1]
