@@ -7,6 +7,7 @@ public:
         /// Use val as index of array
         unordered_map<int,int> numToIdx;
         for(int i=0; i<nums.size(); i++) {
+        //  if(numToIdx.contains(target-nums[i]))    
             if(numToIdx.count(target-nums[i])) {
                 return {numToIdx[target-nums[i]], i};
             }
